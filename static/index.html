@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="轻记，本地个人记账本。记录日常，理清每一笔收支。">
+  <title>轻记 · 个人记账本</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="stylesheet" href="/styles.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+<svg class="sprite" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 5h12M8 12h12M8 19h12M3 5h.01M3 12h.01M3 19h.01"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 3v17h17M9 15V9m5 6V5m5 10v-4"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 3v12m-5-5 5 5 5-5M4 16v4h16v-4"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="M12 16V4m-5 5 5-5 5 5M4 16v4h16v-4"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="m15 4 5 5M4 20l5-1L21 7l-4-4L5 15z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18M9 6V3h6v3M6 6l1 15h10l1-15M10 10v7m4-7v7"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M20 7H5a2 2 0 0 1 0-4h13v4M3 5v14a2 2 0 0 0 2 2h15V7m0 5h-6v5h6m-3-2.5h.01"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32 1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+</defs></svg>
+<a href="#main" class="skip-link">跳到主要内容</a>
+<aside class="sidebar">
+  <a class="brand" href="/" aria-label="轻记首页"><img src="/favicon.svg" alt="" width="39" height="39"><span>轻记<small>让每一笔，都清晰</small></span></a>
+  <div class="nav-caption">我的账本</div>
+  <nav aria-label="主导航">
+    <button class="nav-item active" data-view="overview" aria-current="page"><svg><use href="#i-grid"/></svg>账本总览</button>
+    <button class="nav-item" data-view="records"><svg><use href="#i-list"/></svg>全部记录<span id="nav-count">0</span></button>
+    <button class="nav-item" data-view="analysis"><svg><use href="#i-chart"/></svg>收支分析</button>
+  </nav>
+  <div class="sidebar-note"><div class="plant" aria-hidden="true">✳</div><strong>小记录，大有数。</strong><p>把日常留在账本里，<br>让生活多一份从容。</p></div>
+  <div class="sidebar-bottom"><span class="status-dot"></span>本地账本<span class="version">v1.0</span><small>记录保存在这台电脑</small></div>
+</aside>
+<main id="main">
+  <header class="page-header"><div><div class="eyebrow">YOUR PERSONAL LEDGER</div><h1 id="page-title">账本总览</h1><p id="page-subtitle">记录生活的点滴，让收支一目了然。</p></div><div class="header-actions"><span id="today-label"></span><button class="theme-toggle" id="theme-toggle" type="button" aria-label="切换明暗主题" title="切换明暗主题"><svg><use href="#i-moon"/></svg></button><button class="button primary" id="add-record"><svg><use href="#i-plus"/></svg>记一笔</button></div></header>
+  <div class="notice error" id="page-error" role="alert" hidden></div>
+  <section class="filter-panel" aria-label="筛选账目">
+    <div class="filter-top"><div class="periods" aria-label="快捷日期范围"><button data-period="all" class="selected" aria-pressed="true">全部时间</button><button data-period="month" aria-pressed="false">本月</button><button data-period="last" aria-pressed="false">上月</button><button data-period="year" aria-pressed="false">今年</button></div><span class="filter-hint" id="filter-label">查看全部收支</span></div>
+    <form id="filter-form"><div class="filter-fields">
+      <label>开始日期<input type="date" name="start" id="filter-start"></label>
+      <label>结束日期<input type="date" name="end" id="filter-end"></label>
+      <label>收支类型<select name="type"><option value="">全部类型</option><option value="expense">支出</option><option value="income">收入</option></select></label>
+      <label>类别<select name="category" id="filter-category"><option value="">全部类别</option></select></label>
+      <label>最低金额<input type="number" name="min" min="0" max="99999999.99" step="0.01" placeholder="¥ 0.00"></label>
+      <label>最高金额<input type="number" name="max" min="0" max="99999999.99" step="0.01" placeholder="不限"></label>
+      <button type="submit" class="button filter-submit">筛选</button><button type="button" class="text-button" id="reset-filters">重置</button>
+    </div><div class="search-row"><label class="search-field"><svg><use href="#i-search"/></svg><input name="q" aria-label="搜索备注或类别" placeholder="搜索备注或类别…" maxlength="100"></label><span id="results-label" aria-live="polite">正在读取账本…</span></div></form>
+  </section>
+  <section class="summary-grid" aria-label="收支汇总">
+    <article class="summary-card balance"><div class="card-label">收支结余<span class="card-symbol"><svg><use href="#i-wallet"/></svg></span></div><div class="money" id="balance-total">¥ 0.00</div><div class="summary-foot">收入 − 支出<span>人民币 CNY</span></div></article>
+    <article class="summary-card"><div class="card-label">总收入<span class="card-symbol income-symbol">↙</span></div><div class="money income" id="income-total">¥ 0.00</div><div class="summary-foot">当前筛选范围<span id="income-count">0 笔收入</span></div></article>
+    <article class="summary-card"><div class="card-label">总支出<span class="card-symbol expense-symbol">↗</span></div><div class="money" id="expense-total">¥ 0.00</div><div class="summary-foot">当前筛选范围<span id="expense-count">0 笔支出</span></div></article>
+  </section>
+  <section class="charts-grid" id="charts-section" aria-label="收支图表">
+    <article class="panel trend-panel"><div class="panel-heading"><div><h2>收支趋势</h2><p id="trend-subtitle">按月看看钱的来去</p></div><div class="legend"><span><i class="income-dot"></i>收入</span><span><i class="expense-dot"></i>支出</span></div></div><div id="trend-chart" class="trend-chart"></div></article>
+    <article class="panel category-panel"><div class="panel-heading"><div><h2>支出分布</h2><p>每一份支出，都有去处</p></div><span class="tiny-label">按类别</span></div><div id="category-chart" class="category-chart"></div></article>
+  </section>
+  <section class="panel records-panel" id="records-section" aria-label="记账记录">
+    <div class="panel-heading records-heading"><div><h2 id="records-title">最近记录</h2><p id="records-subtitle">每一笔，都是生活的足迹</p></div><div class="record-actions"><button class="text-button" id="export-csv"><svg><use href="#i-down"/></svg>导出 CSV</button><button class="text-button green" id="view-all">查看全部<svg><use href="#i-arrow"/></svg></button></div></div>
+    <p class="mobile-table-hint">左右滑动表格，查看金额和操作 →</p>
+    <div class="table-wrap"><table><thead><tr><th>类别 / 备注</th><th>日期</th><th>类型</th><th class="amount-cell">金额</th><th class="operation-cell">操作</th></tr></thead><tbody id="records-body"></tbody></table></div>
+    <div id="records-empty" class="empty-state" hidden><div class="empty-mark"><svg><use href="#i-list"/></svg></div><h3 id="empty-title">从第一笔记录开始</h3><p id="empty-copy">一杯咖啡，一份收入，都值得记下来。</p><button class="button primary" id="empty-add">记下第一笔</button></div>
+    <div class="pagination" id="pagination" hidden><span id="page-info"></span><div><button class="button small" id="prev-page">上一页</button><button class="button small" id="next-page">下一页</button></div></div>
+  </section>
+  <section class="panel" id="analysis-details" hidden><div class="panel-heading"><div><h2>类别收支明细</h2><p>与上方筛选条件同步</p></div></div><div class="table-wrap"><table><thead><tr><th>类别</th><th>笔数</th><th class="amount-cell">收入</th><th class="amount-cell">支出</th><th class="amount-cell">结余</th></tr></thead><tbody id="analysis-body"></tbody></table></div></section>
+  <footer><span><span class="status-dot"></span><span id="save-status">本地保存，安心记录</span></span><div><button id="backup-json" class="text-button"><svg><use href="#i-down"/></svg>备份账本</button><button id="import-json" class="text-button"><svg><use href="#i-up"/></svg>导入 JSON</button></div></footer>
+</main>
+<dialog id="record-dialog" aria-labelledby="dialog-title">
+  <form id="record-form"><div class="dialog-heading"><div><div class="eyebrow">A LITTLE EVERY DAY</div><h2 id="dialog-title">记一笔</h2></div><button type="button" class="icon-button" id="close-dialog" aria-label="关闭记账窗口"><svg><use href="#i-close"/></svg></button></div>
+    <div class="type-toggle"><label><input type="radio" name="type" value="expense" checked><span>↗ 支出</span></label><label><input type="radio" name="type" value="income"><span>↙ 收入</span></label></div>
+    <label class="amount-label">金额（元）<div class="amount-input"><span>¥</span><input id="record-amount" name="amount" type="number" step="0.01" min="0.01" max="99999999.99" placeholder="0.00" required autocomplete="off"></div></label>
+    <div class="form-two"><label>日期<input id="record-date" name="date" type="date" required></label><label>类别<input id="record-category" name="category" list="category-options" maxlength="30" placeholder="选择或输入类别" required><datalist id="category-options"></datalist></label></div>
+    <label class="note-label">备注 <span>选填</span><textarea id="record-note" name="note" maxlength="500" rows="3" placeholder="这一笔，想记点什么？"></textarea></label>
+    <div class="notice error" id="form-error" role="alert" hidden></div><div class="dialog-footer"><span>保存到本地账本</span><button type="submit" class="button primary" id="save-record">保存记录</button></div>
+  </form>
+</dialog>
+<dialog id="confirm-dialog" aria-labelledby="confirm-title"><h2 id="confirm-title">确认操作</h2><p id="confirm-copy"></p><div class="dialog-footer"><button class="button" id="confirm-cancel">取消</button><button class="button primary" id="confirm-ok">确认</button></div></dialog>
+<input type="file" id="import-file" accept=".json,application/json" hidden>
+<div class="toast" id="toast" role="status" hidden></div>
+<noscript><div class="noscript">请启用浏览器 JavaScript 后使用轻记。</div></noscript>
+</body>
+</html>
